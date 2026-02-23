@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* ================================
+   FRONTEND THEME – KIDO PARADISE
+================================ */
+
+:root {
+  /* Frontend palette */
+  --fe-bg: #f7f3ee;           /* beige / cream */
+  --fe-surface: #ffffff;
+  --fe-soft: #f1efe9;
+
+  --fe-green: #cfe6d8;        /* pastel green */
+  --fe-mauve: #e4d9ef;        /* pastel mauve */
+
+  --fe-text-main: #2b2b2b;
+  --fe-text-soft: #6b6b6b;
+  --fe-border: #e6e1d8;
+}
+
+/* ❌ on SUPPRIME les anciennes variables */
+:root {
+  --background: unset;
+  --foreground: unset;
+}
+
+body {
+  background-color: var(--fe-bg);
+  color: var(--fe-text-main);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Scrollbar clean */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}

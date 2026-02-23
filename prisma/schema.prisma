@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  library          Library[]
+  oneToOneRequests OneToOneRequest[]
+  orders           Order[]
+  reviews          Review[]
+}
+
+model Professional {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  photoUrl   String?
+  specialty  String
+  experience Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  oneToOneRequests OneToOneRequest[]
+  videos           Video[]
+  availability     AvailabilitySlot[]
+}
+
+model AvailabilitySlot {
+  id             String @id @default(uuid())
+  professionalId String
+
+  startTime DateTime
+  endTime   DateTime
+
+  status String @default("available") // available | booked | disabled
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  professional Professional @relation(fields: [professionalId], references: [id])
+
+  @@unique([professionalId, startTime])
+  @@index([professionalId])
+  @@index([startTime])
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  videos Video[]
+}
+
+model Video {
+  id             String  @id @default(uuid())
+  title          String
+  slug           String
+  description    String
+  price          Float
+  type           String  @default("VIDEO")
+  videoUrl       String
+  coverImageUrl  String?
+  articleContent String?
+
+  professionalId String
+  categoryId     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  library Library[]
+  orders  Order[]
+  reviews Review[]
+
+  //  AJOUT ICI
+  oneToOneRequests OneToOneRequest[]
+
+  category     Category     @relation(fields: [categoryId], references: [id])
+  professional Professional @relation(fields: [professionalId], references: [id])
+
+  @@unique([categoryId, slug])
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  userId    String
+  videoId   String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id])
+  video   Video    @relation(fields: [videoId], references: [id])
+  payment Payment?
+
+  @@index([userId])
+  @@index([videoId])
+  @@index([status])
+}
+
+model Payment {
+  id         String    @id @default(uuid())
+  orderId    String    @unique
+  amount     Float
+  method     String
+  status     String    @default("pending")
+  paidAt     DateTime?
+  receiptUrl String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([status])
+  @@index([paidAt])
+}
+
+model OneToOneRequest {
+  id             String  @id @default(uuid())
+  userId         String
+  professionalId String
+  courseId       String?
+
+  scheduledAt DateTime
+  status      String
+  message     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id])
+  professional Professional @relation(fields: [professionalId], references: [id])
+  course       Video?       @relation(fields: [courseId], references: [id])
+
+  @@index([userId])
+  @@index([professionalId])
+  @@index([courseId])
+}
+
+model Library {
+  id      String   @id @default(uuid())
+  userId  String
+  videoId String
+  addedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  video Video @relation(fields: [videoId], references: [id])
+
+  @@unique([userId, videoId])
+  @@index([userId])
+  @@index([videoId])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  videoId   String
+  rating    Int
+  message   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
+  @@index([videoId])
+}
