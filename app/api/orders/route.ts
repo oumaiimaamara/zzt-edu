@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
     const order = await prisma.order.create({
       data: {
-        userId: user.id,
+        userId: user.userId,
         videoId,
         status: "pending",
       },
