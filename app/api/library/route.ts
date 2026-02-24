@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   const library = await prisma.library.findMany({
-    where: { userId: user.id },
+    where: { userId: user.userId }, // ✅ ici userId au lieu de id
     include: {
       video: true,
     },
