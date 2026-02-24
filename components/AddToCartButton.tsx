@@ -14,10 +14,19 @@ type Props = {
 export default function AddToCartButton(props: Props) {
   const cart = useCart();
 
+  const safeItem = {
+    id: props.id,
+    title: props.title,
+    price: props.price,
+    coverImageUrl: props.coverImageUrl ?? "",
+    categoryName: props.categoryName ?? "",
+    href: props.href ?? "",
+  };
+
   return (
     <button
       type="button"
-      onClick={() => cart.addItem(props)}
+      onClick={() => cart.addItem(safeItem)}
       className="inline-flex items-center justify-center rounded-2xl bg-orange-400/90 px-4 py-2 text-white font-medium hover:bg-orange-500 transition"
     >
       Acheter
