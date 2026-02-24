@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   try {
     const reservation = await prisma.oneToOneRequest.create({
       data: {
-        userId: user.id,
+        userId: user.userId, // ✅ correction ici
         professionalId,
         scheduledAt,
         message,
