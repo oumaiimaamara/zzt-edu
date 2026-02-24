@@ -15,7 +15,7 @@ export async function GET(
     include: { video: true, payment: true },
   });
 
-  if (!order || order.userId !== user.id) {
+  if (!order || order.userId !== user.userId) {
     return new Response("Forbidden", { status: 403 });
   }
 
