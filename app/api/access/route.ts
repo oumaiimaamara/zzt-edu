@@ -19,7 +19,9 @@ export async function GET(req: Request) {
     }
 
     const decoded = await verifyToken(token);
-    const userId = decoded?.userId;
+
+    // ⚡ Correction : utiliser decoded.id à la place de userId
+    const userId = decoded?.id;
     if (!userId) return NextResponse.json({ hasAccess: false }, { status: 200 });
 
     // ✅ user a accès si la vidéo est dans Library
