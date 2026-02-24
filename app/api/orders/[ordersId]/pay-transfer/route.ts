@@ -21,7 +21,7 @@ export async function POST(
     });
 
     if (!order) return NextResponse.json({ message: "Commande introuvable" }, { status: 404 });
-    if (order.userId !== user.id) return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
+    if (order.userId !== user.userId) return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
 
     const form = await req.formData();
     const file = form.get("file");
