@@ -1,25 +1,46 @@
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth"; // ta fonction pour décoder le token et récupérer l'userId
-import jwt from "jsonwebtoken";
+import { verifyToken } from "@/lib/auth";
+
+interface PaymentBody {
+  orderId: string;
+  paymentMethod: string;
+  status: string;
+}
+
 export async function POST(req: Request) {
   const authHeader = req.headers.get("Authorization");
-  if (!authHeader) return new Response("Token manquant", { status: 401 });
+  if (!authHeader) {
+    return new Response("Token manquant", { status: 401 });
+  }
 
-  const token = authHeader.split(" ")[1];
-  let payload: any;
+  const token = authHeader.replace("Bearer ", "");
+  const user = verifyToken(token);
 
-  try {
-    payload = jwt.verify(token, process.env.JWT_SECRET!);
-  } catch {
+  if (!user) {
     return new Response("Token invalide", { status: 401 });
   }
 
-  const { orderId, paymentMethod, status } = await req.json();
+  const body: PaymentBody = await req.json();
+  const { orderId, paymentMethod, status } = body;
 
-  const payment = await prisma.payment.create({
-    data: {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { video: true }, // ✅ nécessaire
+  });
+
+  if (!order || order.userId !== user.userId) {
+    return new Response("Accès refusé", { status: 403 });
+  }
+
+  const payment = await prisma.payment.upsert({
+    where: { orderId },
+    update: {
+      method: paymentMethod,
+      status,
+    },
+    create: {
       orderId,
-      userId: payload.id,
+      amount: order.video.price, // ✅ correct
       method: paymentMethod,
       status,
     },
