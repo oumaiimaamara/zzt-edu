@@ -23,7 +23,8 @@ export async function POST(
       return NextResponse.json({ message: "Commande introuvable" }, { status: 404 });
     }
 
-    if (order.userId !== user.id) {
+    // ✅ toujours user.userId
+    if (order.userId !== user.userId) {
       return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
     }
 
@@ -35,10 +36,10 @@ export async function POST(
 
     await prisma.library.upsert({
       where: {
-        userId_videoId: { userId: user.id, videoId: order.videoId },
+        userId_videoId: { userId: user.userId, videoId: order.videoId },
       },
       update: {},
-      create: { userId: user.id, videoId: order.videoId },
+      create: { userId: user.userId, videoId: order.videoId },
     });
 
     return NextResponse.json({ message: "Paiement validé (dev)" });
