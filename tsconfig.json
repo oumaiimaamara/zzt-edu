@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -14,10 +18,14 @@
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
-      { "name": "next" }
+      {
+        "name": "next"
+      }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -26,7 +34,12 @@
     "**/*.tsx",
     "**/*.mts",
     "app/layout.tsx",
-    "app/videos/[categorySlug]/[CourseSlug]"
+    "app/videos/[categorySlug]/[CourseSlug]",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude": [
+    "node_modules",
+    ".next"
+  ]
 }
