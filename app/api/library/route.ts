@@ -1,23 +1,27 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromCookies } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/authFromRequest";
 
-export async function GET() {
-  const user = await getUserFromCookies();
+export async function GET(req: Request) {
+  try {
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
+      return NextResponse.json({ message: "Non connecté" }, { status: 401 });
+    }
 
-  if (!user) {
-    return NextResponse.json(
-      { message: "Non authentifié" },
-      { status: 401 }
-    );
+    const items = await prisma.library.findMany({
+      where: { userId },
+      orderBy: { addedAt: "desc" },
+      include: {
+        video: {
+          include: { category: true, professional: true },
+        },
+      },
+    });
+
+    return NextResponse.json({ items }, { status: 200 });
+  } catch (err) {
+    console.error("GET /api/library error:", err);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
-
-  const library = await prisma.library.findMany({
-    where: { userId: user.userId }, // ✅ ici userId au lieu de id
-    include: {
-      video: true,
-    },
-  });
-
-  return NextResponse.json({ library });
 }

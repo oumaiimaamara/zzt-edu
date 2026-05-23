@@ -1,53 +1,33 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromCookies } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/authFromRequest";
 
 export async function POST(req: Request) {
-  const user = await getUserFromCookies();
-
-  if (!user) {
-    return NextResponse.json(
-      { message: "Non authentifié" },
-      { status: 401 }
-    );
-  }
-
-  const body = await req.json();
-
-  const {
-    professionalId,
-    date,
-    message,
-    courseId, // optionnel
-  } = body;
-
-  if (!professionalId || !date) {
-    return NextResponse.json(
-      { message: "Données manquantes" },
-      { status: 400 }
-    );
-  }
-
-  const scheduledAt = new Date(date);
-
   try {
-    const reservation = await prisma.oneToOneRequest.create({
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
+      return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { professionalId, message, date } = body;
+
+    if (!professionalId) {
+      return NextResponse.json({ message: "professionalId manquant" }, { status: 400 });
+    }
+
+    const reservation = await prisma.reservation.create({
       data: {
-        userId: user.userId, // ✅ correction ici
+        userId,
         professionalId,
-        scheduledAt,
-        message,
-        status: "pending",
-        ...(courseId && { courseId }),
+        message: message || null,
+        date: date ? new Date(date) : null,
       },
     });
 
-    return NextResponse.json({ reservation });
-  } catch (error) {
-    console.error("ERREUR RESERVATION:", error);
-    return NextResponse.json(
-      { message: "Erreur serveur" },
-      { status: 500 }
-    );
+    return NextResponse.json({ reservation }, { status: 200 });
+  } catch (err) {
+    console.error("POST /api/one-to-one error:", err);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
 }

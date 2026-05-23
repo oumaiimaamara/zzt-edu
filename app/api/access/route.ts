@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyToken } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/authFromRequest";
 
 export async function GET(req: Request) {
   try {
@@ -11,18 +11,11 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "videoId manquant" }, { status: 400 });
     }
 
-    const authHeader = req.headers.get("Authorization") || "";
-    const token = authHeader.replace("Bearer ", "");
-
-    if (!token) {
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
       return NextResponse.json({ hasAccess: false }, { status: 200 });
     }
 
-    const decoded = await verifyToken(token);
-    const userId = decoded?.userId; // ✅ userId existe maintenant
-    if (!userId) return NextResponse.json({ hasAccess: false }, { status: 200 });
-
-    // ✅ user a accès si la vidéo est dans Library
     const lib = await prisma.library.findUnique({
       where: { userId_videoId: { userId, videoId } },
       select: { id: true },

@@ -1,21 +1,39 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentUserId } from "@/lib/currentUser";
+import { getUserIdFromRequest } from "@/lib/authFromRequest";
 
 export async function POST(req: Request) {
-  const userId = await getCurrentUserId();
-  if (!userId) return NextResponse.json({ error: "NOT_AUTHENTICATED" }, { status: 401 });
+  try {
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
+      return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
+    }
 
-  const { videoId } = await req.json();
-  if (!videoId) return NextResponse.json({ error: "MISSING_VIDEO_ID" }, { status: 400 });
+    const body = await req.json();
+    const { videoId } = body;
 
-  await prisma.order.create({ data: { userId, videoId, status: "paid" } });
+    if (!videoId) {
+      return NextResponse.json({ message: "videoId manquant" }, { status: 400 });
+    }
 
-  await prisma.library.upsert({
-    where: { userId_videoId: { userId, videoId } },
-    update: {},
-    create: { userId, videoId },
-  });
+    const video = await prisma.video.findUnique({ where: { id: videoId } });
+    if (!video) {
+      return NextResponse.json({ message: "Cours introuvable" }, { status: 404 });
+    }
 
-  return NextResponse.json({ ok: true });
+    const order = await prisma.order.create({
+      data: { userId, videoId, status: "paid" },
+    });
+
+    await prisma.library.upsert({
+      where: { userId_videoId: { userId, videoId } },
+      update: {},
+      create: { userId, videoId },
+    });
+
+    return NextResponse.json({ order }, { status: 200 });
+  } catch (err) {
+    console.error("POST /api/purchase error:", err);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
+  }
 }
