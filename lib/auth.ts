@@ -13,24 +13,18 @@ export function signToken(payload: {
 
 export function verifyToken(token: string) {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-
-    // ✅ renommer id en userId pour être cohérent partout
-    return {
-      userId: decoded.userId,
-      email: decoded.email,
-      role: decoded.role,
-    };
+    return jwt.verify(token, JWT_SECRET);
   } catch {
     return null;
   }
 }
 
 export async function getUserFromCookies() {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies(); // NEXT 15 FIX
+
   const token = cookieStore.get("auth_token")?.value;
 
   if (!token) return null;
 
-  return verifyToken(token);
+  return verifyToken(token) as any;
 }

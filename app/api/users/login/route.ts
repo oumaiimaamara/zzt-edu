@@ -15,40 +15,60 @@ export async function POST(req: Request) {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
+
     if (!user) {
-      return NextResponse.json({ message: "Utilisateur non trouvé" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
     }
 
     const ok = await bcrypt.compare(password, user.password);
+
     if (!ok) {
-      return NextResponse.json({ message: "Mot de passe incorrect" }, { status: 401 });
+      return NextResponse.json(
+        { message: "Mot de passe incorrect" },
+        { status: 401 }
+      );
     }
 
-    const token = signToken({ userId: user.id, email: user.email, role: user.role });
+    const token = signToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
 
-    //  Ajout cookie HTTP-only pour que /api/library puisse authentifier
     const res = NextResponse.json(
       {
         message: "Login OK",
-        token, // (tu peux le garder pour le localStorage si tu veux)
-        user: { id: user.id, name: user.name, email: user.email, role: user.role },
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
       },
       { status: 200 }
     );
 
+    // 🔥 FIX ICI
     res.cookies.set({
-      name: "token",
+      name: "auth_token",
       value: token,
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return res;
   } catch (err) {
     console.error("POST /api/users/login error:", err);
-    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Erreur serveur" },
+      { status: 500 }
+    );
   }
 }

@@ -1,12 +1,11 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getUserFromCookies } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const auth = await getUserFromCookies();
 
   if (!auth) {
-    return NextResponse.json({ user: null });
+    return Response.json({ user: null });
   }
 
   const user = await prisma.user.findUnique({
@@ -19,5 +18,5 @@ export async function GET() {
     },
   });
 
-  return NextResponse.json({ user });
+  return Response.json({ user });
 }
