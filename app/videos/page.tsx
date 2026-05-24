@@ -52,7 +52,7 @@ export default async function VideosCatalogPage() {
       href: `/videos/${c.category!.slug}/${c.slug}`,
       imageUrl: normalizeCover(c.coverImageUrl),
       price: Number(c.price ?? 0),
-      tag: c.type === "VIDEO" ? "Nouveauté vidéo" : "Nouveau contenu",
+      tag: c.type === "VIDEO" ? "Nouvelle vidéo" : "Nouveau contenu",
     }));
 
   const pillClass = "mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium";

@@ -19,7 +19,44 @@ function slugify(input: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-/* ─── Modal Ajouter / Modifier ─── */
+/* ── Icons ── */
+const IconX = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+const IconPencil = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.213l-4 1 1-4L16.862 3.487z" />
+  </svg>
+);
+const IconPlus = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+  </svg>
+);
+const IconFolder = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h5l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+  </svg>
+);
+const IconSearch = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+  </svg>
+);
+const IconAlert = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+  </svg>
+);
+const IconSpin = ({ className = "h-6 w-6" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={`${className} animate-spin`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  </svg>
+);
+
+/* ── Modal Ajouter / Modifier ── */
 function CategoryModal({
   mode,
   initial,
@@ -81,101 +118,110 @@ function CategoryModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.4)" }}
+      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl ring-1 ring-emerald-900/10">
-        {/* Header */}
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-emerald-950">
-            {mode === "create" ? "Nouvelle catégorie" : "Modifier la catégorie"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-emerald-400 hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
-            aria-label="Fermer"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+      <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+        {/* Bande couleur en haut */}
+        <div className="h-1 w-full bg-gradient-to-r from-emerald-400 to-teal-500" />
 
-        <div className="flex flex-col gap-4">
-          {/* Nom */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-emerald-800">
-              Nom <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="Ex : Allaitement"
-              autoFocus
-              className="w-full rounded-xl border border-emerald-200 bg-emerald-50/50 px-3.5 py-2.5 text-sm text-emerald-950 outline-none placeholder:text-emerald-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition"
-            />
-          </div>
-
-          {/* Slug */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-emerald-800">Slug</label>
-            <input
-              type="text"
-              value={slug}
-              onChange={(e) => { setSlug(e.target.value); setAutoSlug(false); }}
-              placeholder="généré-automatiquement"
-              className="w-full rounded-xl border border-emerald-200 bg-emerald-50/50 px-3.5 py-2.5 font-mono text-xs text-emerald-600 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition"
-            />
-            <p className="mt-1 text-xs text-emerald-400">Généré automatiquement depuis le nom</p>
-          </div>
-
-          {/* Catégorie parente */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-emerald-800">
-              Catégorie parente <span className="font-normal text-emerald-400">(optionnel)</span>
-            </label>
-            <select
-              value={parentId}
-              onChange={(e) => setParentId(e.target.value)}
-              className="w-full rounded-xl border border-emerald-200 bg-emerald-50/50 px-3.5 py-2.5 text-sm text-emerald-950 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition"
-            >
-              <option value="">— Aucune (catégorie racine) —</option>
-              {availableParents.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Erreur */}
-          {error && (
-            <div className="flex items-center gap-2 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-600 ring-1 ring-red-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-              </svg>
-              {error}
+        <div className="p-6">
+          {/* Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-slate-900">
+                {mode === "create" ? "Nouvelle catégorie" : "Modifier"}
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-400">
+                {mode === "create" ? "Ajoutez une nouvelle catégorie au catalogue" : `Modification de « ${initial?.name} »`}
+              </p>
             </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-1">
             <button
               onClick={onClose}
-              disabled={loading}
-              className="rounded-xl border border-emerald-200 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 transition-colors disabled:opacity-50"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              aria-label="Fermer"
             >
-              Annuler
+              <IconX className="h-4 w-4" />
             </button>
-            <button
-              onClick={submit}
-              disabled={loading}
-              className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors disabled:opacity-60"
-            >
-              {loading
-                ? (mode === "create" ? "Création…" : "Enregistrement…")
-                : (mode === "create" ? "Créer" : "Enregistrer")}
-            </button>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            {/* Nom */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Nom <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                placeholder="Ex : Allaitement"
+                autoFocus
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none placeholder:text-slate-300 transition focus:border-emerald-400 focus:bg-white focus:ring-3 focus:ring-emerald-50"
+              />
+            </div>
+
+            {/* Slug */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Slug</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-mono text-slate-300">/</span>
+                <input
+                  type="text"
+                  value={slug}
+                  onChange={(e) => { setSlug(e.target.value); setAutoSlug(false); }}
+                  placeholder="generé-auto"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-7 pr-4 font-mono text-xs text-slate-500 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-3 focus:ring-emerald-50"
+                />
+              </div>
+              <p className="mt-1.5 text-xs text-slate-400">Généré automatiquement depuis le nom</p>
+            </div>
+
+            {/* Catégorie parente */}
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Catégorie parente <span className="font-normal normal-case text-slate-400">(optionnel)</span>
+              </label>
+              <select
+                value={parentId}
+                onChange={(e) => setParentId(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-400 focus:bg-white focus:ring-3 focus:ring-emerald-50"
+              >
+                <option value="">— Racine (aucun parent) —</option>
+                {availableParents.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Erreur */}
+            {error && (
+              <div className="flex items-center gap-2.5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                <IconAlert className="h-4 w-4 shrink-0" />
+                {error}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2.5 pt-1">
+              <button
+                onClick={onClose}
+                disabled={loading}
+                className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={submit}
+                disabled={loading}
+                className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-60"
+              >
+                {loading
+                  ? (mode === "create" ? "Création…" : "Enregistrement…")
+                  : (mode === "create" ? "Créer la catégorie" : "Enregistrer")}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -183,7 +229,7 @@ function CategoryModal({
   );
 }
 
-/* ─── Dialog Suppression ─── */
+/* ── Dialog Suppression ── */
 function DeleteDialog({
   category,
   onClose,
@@ -202,11 +248,9 @@ function DeleteDialog({
       const res = await fetch(`/api/admin/categories/${category.id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json();
-        setError(
-          data.error === "HAS_CHILDREN"
-            ? "Supprimez d'abord les sous-catégories."
-            : "Impossible de supprimer cette catégorie."
-        );
+        setError(data.error === "HAS_CHILDREN"
+          ? "Supprimez d'abord les sous-catégories."
+          : "Impossible de supprimer cette catégorie.");
         return;
       }
       onDeleted();
@@ -221,55 +265,53 @@ function DeleteDialog({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.4)" }}
+      style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(4px)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl ring-1 ring-emerald-900/10">
-        <div className="mb-1 flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="p-6">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 01-1-1V5a1 1 0 011-1h8a1 1 0 011 1v1a1 1 0 01-1 1H9z" />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-emerald-950">Supprimer la catégorie</h2>
-        </div>
-        <p className="mb-5 mt-2 text-sm text-emerald-600">
-          Voulez-vous vraiment supprimer{" "}
-          <span className="font-semibold text-emerald-900">« {category.name} »</span> ?
-          Cette action est irréversible.
-        </p>
+          <h2 className="text-base font-semibold text-slate-900">Supprimer la catégorie</h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+            Vous êtes sur le point de supprimer{" "}
+            <span className="font-semibold text-slate-800">« {category.name} »</span>.
+            Cette action est irréversible.
+          </p>
 
-        {error && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-600 ring-1 ring-red-200">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-            </svg>
-            {error}
+          {error && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+              <IconAlert className="h-4 w-4 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          <div className="mt-6 flex gap-2.5">
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="flex-1 rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={confirm}
+              disabled={loading}
+              className="flex-1 rounded-xl bg-red-500 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600 disabled:opacity-60"
+            >
+              {loading ? "Suppression…" : "Supprimer"}
+            </button>
           </div>
-        )}
-
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="rounded-xl border border-emerald-200 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 transition-colors disabled:opacity-50"
-          >
-            Annuler
-          </button>
-          <button
-            onClick={confirm}
-            disabled={loading}
-            className="rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-60"
-          >
-            {loading ? "Suppression…" : "Supprimer"}
-          </button>
         </div>
       </div>
     </div>
   );
 }
 
-/* ─── Page principale ─── */
+/* ── Page principale ── */
 export default function CategoriesAdminPage() {
   const [flat, setFlat] = useState<FlatCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -308,193 +350,224 @@ export default function CategoriesAdminPage() {
   const rootCount = flat.filter((c) => !c.parentId).length;
   const childCount = flat.filter((c) => !!c.parentId).length;
 
-  const getParentName = (parentId: string | null) => {
-    if (!parentId) return null;
-    return flat.find((c) => c.id === parentId)?.name ?? null;
-  };
+  const getParentName = (parentId: string | null) =>
+    parentId ? (flat.find((c) => c.id === parentId)?.name ?? null) : null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-emerald-50 via-white to-white">
-      <section className="mx-auto max-w-5xl px-4 py-10">
+    <main className="min-h-screen bg-slate-50/60">
+      <div className="mx-auto max-w-5xl px-6 py-10">
 
         {/* ── Header ── */}
-        <div className="mb-8 flex items-start justify-between">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-emerald-950">Catégories</h1>
-            <p className="mt-1 text-sm text-emerald-500">
-              {flat.length} catégorie{flat.length !== 1 ? "s" : ""} au total
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-emerald-500">
+              Administration
             </p>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Catégories</h1>
           </div>
           <button
             onClick={() => setModal({ mode: "create" })}
-            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
+            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-emerald-200 transition-all hover:bg-emerald-700 hover:shadow-md hover:shadow-emerald-200 active:scale-95"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Ajouter
+            <IconPlus className="h-4 w-4" />
+            Nouvelle catégorie
           </button>
         </div>
 
         {/* ── Stats ── */}
         <div className="mb-6 grid grid-cols-3 gap-4">
           {[
-            { label: "Total", value: flat.length, color: "bg-emerald-50 text-emerald-700", icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-            )},
-            { label: "Racines", value: rootCount, color: "bg-teal-50 text-teal-700", icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h5l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" /></svg>
-            )},
-            { label: "Sous-catégories", value: childCount, color: "bg-amber-50 text-amber-700", icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
-            )},
-          ].map(({ label, value, color, icon }) => (
-            <div key={label} className="rounded-2xl bg-white p-5 ring-1 ring-emerald-900/5">
-              <div className={`mb-3 inline-flex rounded-xl p-2 ${color}`}>
+            {
+              label: "Total",
+              value: flat.length,
+              sub: "catégories créées",
+              color: "text-emerald-600",
+              bg: "bg-emerald-50",
+              icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>,
+            },
+            {
+              label: "Racines",
+              value: rootCount,
+              sub: "catégories principales",
+              color: "text-teal-600",
+              bg: "bg-teal-50",
+              icon: <IconFolder className="h-5 w-5" />,
+            },
+            {
+              label: "Sous-catégories",
+              value: childCount,
+              sub: "catégories imbriquées",
+              color: "text-violet-600",
+              bg: "bg-violet-50",
+              icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>,
+            },
+          ].map(({ label, value, sub, color, bg, icon }) => (
+            <div
+              key={label}
+              className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white px-5 py-4 shadow-sm"
+            >
+              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${bg} ${color}`}>
                 {icon}
               </div>
-              <div className="text-2xl font-bold text-emerald-950">{value}</div>
-              <div className="mt-0.5 text-sm text-emerald-500">{label}</div>
+              <div>
+                <div className="text-2xl font-bold text-slate-900">{value}</div>
+                <div className="text-xs text-slate-400">{sub}</div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* ── Recherche ── */}
-        <div className="relative mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-300"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Rechercher par nom ou slug…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-emerald-200 bg-white py-2.5 pl-10 pr-4 text-sm text-emerald-950 outline-none placeholder:text-emerald-300 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition"
-          />
-        </div>
+        {/* ── Barre recherche + tableau ── */}
+        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
 
-        {/* ── Tableau ── */}
-        <div className="overflow-hidden rounded-2xl bg-white ring-1 ring-emerald-900/5">
+          {/* Toolbar */}
+          <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4">
+            <div className="relative flex-1">
+              <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-300" />
+              <input
+                type="text"
+                placeholder="Rechercher par nom ou slug…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm text-slate-800 outline-none placeholder:text-slate-300 transition focus:border-emerald-400 focus:bg-white focus:ring-3 focus:ring-emerald-50"
+              />
+            </div>
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2.5 text-xs text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+              >
+                <IconX className="h-3.5 w-3.5" />
+                Effacer
+              </button>
+            )}
+            <span className="shrink-0 text-xs text-slate-400">
+              {filtered.length} résultat{filtered.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {/* Contenu */}
           {loading ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-emerald-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span className="text-sm">Chargement…</span>
+            <div className="flex flex-col items-center justify-center gap-3 py-20 text-slate-300">
+              <IconSpin className="h-7 w-7" />
+              <span className="text-sm">Chargement des catégories…</span>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-16">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-emerald-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h5l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
-              </svg>
-              <p className="text-sm text-emerald-400">
-                {search ? "Aucun résultat pour cette recherche." : "Aucune catégorie. Commencez par en ajouter une."}
-              </p>
+            <div className="flex flex-col items-center justify-center gap-3 py-20">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-50">
+                <IconFolder className="h-7 w-7 text-slate-300" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-slate-500">
+                  {search ? "Aucun résultat" : "Aucune catégorie"}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  {search ? `Aucune catégorie ne correspond à « ${search} »` : "Commencez par créer votre première catégorie."}
+                </p>
+              </div>
+              {!search && (
+                <button
+                  onClick={() => setModal({ mode: "create" })}
+                  className="mt-1 flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                >
+                  <IconPlus className="h-4 w-4" />
+                  Créer une catégorie
+                </button>
+              )}
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full">
               <thead>
-                <tr className="border-b border-emerald-100 bg-emerald-50/60">
-                  <th className="w-14 px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-400">#</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-400">Nom</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-400">Slug</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-emerald-400">Type</th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-emerald-400">Actions</th>
+                <tr className="border-b border-slate-100 bg-slate-50/50">
+                  <th className="w-12 px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">#</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Nom</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Slug</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Type</th>
+                  <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-400">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-emerald-50">
+              <tbody>
                 {filtered.map((c, i) => {
                   const parentName = getParentName(c.parentId);
+                  const isLast = i === filtered.length - 1;
                   return (
-                    <tr key={c.id} className="group hover:bg-emerald-50/50 transition-colors">
+                    <tr
+                      key={c.id}
+                      className={`transition-colors hover:bg-slate-50 ${!isLast ? "border-b border-slate-50" : ""}`}
+                    >
                       {/* # */}
-                      <td className="px-6 py-5 text-xs text-emerald-300">{i + 1}</td>
+                      <td className="px-5 py-4 text-xs font-medium text-slate-300">{String(i + 1).padStart(2, "0")}</td>
 
                       {/* Nom */}
-                      <td className="px-6 py-5">
+                      <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
-                          {c.parentId ? (
-                            <span className="text-lg text-emerald-300">↳</span>
-                          ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a2 2 0 012-2h5l2 2h7a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
-                            </svg>
-                          )}
+                          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${c.parentId ? "bg-violet-50 text-violet-400" : "bg-emerald-50 text-emerald-500"}`}>
+                            <IconFolder className="h-4 w-4" />
+                          </div>
                           <div>
-                            <div className="font-semibold text-emerald-950">{c.name}</div>
+                            <div className="text-sm font-semibold text-slate-800">{c.name}</div>
                             {parentName && (
-                              <div className="mt-0.5 text-xs text-emerald-400">dans {parentName}</div>
+                              <div className="mt-0.5 flex items-center gap-1 text-xs text-slate-400">
+                                <span>dans</span>
+                                <span className="font-medium text-slate-500">{parentName}</span>
+                              </div>
                             )}
                           </div>
                         </div>
                       </td>
 
                       {/* Slug */}
-                      <td className="px-6 py-5">
-                        <span className="rounded-lg bg-emerald-50 px-3 py-1.5 font-mono text-xs text-emerald-600 ring-1 ring-emerald-200">
+                      <td className="px-5 py-4">
+                        <code className="rounded-lg bg-slate-100 px-2.5 py-1 font-mono text-xs text-slate-500">
                           {c.slug}
-                        </span>
+                        </code>
                       </td>
 
                       {/* Type */}
-                      <td className="px-6 py-5">
+                      <td className="px-5 py-4">
                         {c.parentId ? (
-                          <span className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-xs font-medium text-violet-600">
+                            <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
                             Sous-catégorie
                           </span>
                         ) : (
-                          <span className="rounded-full bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-600">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                             Racine
                           </span>
                         )}
                       </td>
 
                       {/* Actions */}
-                      <td className="px-6 py-5">
+                      <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-2">
-
-                          {/* Ajouter sous-catégorie */}
+                          {/* Sous-catégorie */}
                           <button
-                            onClick={() =>
-                              setModal({ mode: "create", initial: { id: "", name: "", slug: "", parentId: c.id }, defaultParentId: c.id })
-                            }
+                            onClick={() => setModal({ mode: "create", initial: { id: "", name: "", slug: "", parentId: c.id }, defaultParentId: c.id })}
                             title="Ajouter une sous-catégorie"
-                            className="flex items-center gap-1.5 rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-medium text-emerald-600 opacity-0 transition-all hover:bg-emerald-50 hover:border-emerald-400 group-hover:opacity-100"
+                            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-500 transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                            </svg>
+                            <IconPlus className="h-3 w-3" />
                             Sous-cat.
                           </button>
 
-                          {/* Modifier — icône stylo */}
+                          {/* Modifier */}
                           <button
                             onClick={() => setModal({ mode: "edit", initial: c })}
                             title="Modifier"
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-200 text-emerald-500 opacity-0 transition-all hover:bg-emerald-100 hover:border-emerald-400 hover:text-emerald-800 group-hover:opacity-100"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition-all hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-600"
                           >
-                            {/* Stylo / Pencil */}
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.213l-4 1 1-4L16.862 3.487z" />
-                            </svg>
+                            <IconPencil className="h-3.5 w-3.5" />
                           </button>
 
-                          {/* Supprimer — icône X */}
+                          {/* Supprimer */}
                           <button
                             onClick={() => setDeleteTarget(c)}
                             title="Supprimer"
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-400 opacity-0 transition-all hover:bg-red-50 hover:border-red-400 hover:text-red-600 group-hover:opacity-100"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-500"
                           >
-                            {/* X */}
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <IconX className="h-3.5 w-3.5" />
                           </button>
-
                         </div>
                       </td>
                     </tr>
@@ -503,16 +576,21 @@ export default function CategoriesAdminPage() {
               </tbody>
             </table>
           )}
-        </div>
 
-        {/* Résumé bas de tableau */}
-        {!loading && filtered.length > 0 && (
-          <p className="mt-3 text-right text-xs text-emerald-400">
-            {filtered.length} résultat{filtered.length !== 1 ? "s" : ""}
-            {search && ` pour « ${search} »`}
-          </p>
-        )}
-      </section>
+          {/* Footer tableau */}
+          {!loading && filtered.length > 0 && (
+            <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
+              <p className="text-xs text-slate-400">
+                {flat.length} catégorie{flat.length !== 1 ? "s" : ""} au total
+                {search && ` · ${filtered.length} résultat${filtered.length !== 1 ? "s" : ""}`}
+              </p>
+              <p className="text-xs text-slate-300">
+                {rootCount} racine{rootCount !== 1 ? "s" : ""} · {childCount} sous-cat.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* ── Modals ── */}
       {modal && (
@@ -524,7 +602,6 @@ export default function CategoriesAdminPage() {
           onSaved={load}
         />
       )}
-
       {deleteTarget && (
         <DeleteDialog
           category={deleteTarget}

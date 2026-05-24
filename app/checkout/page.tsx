@@ -294,7 +294,7 @@ export default function CheckoutPage() {
                 className="mt-3 rounded-2xl px-4 py-3 text-xs"
                 style={{ background: "rgba(237,224,255,0.4)", color: "#6b4fa0" }}
               >
-                votre achat est activé immédiatement après confirmation.
+                votre achat sera activé immédiatement après confirmation.
               </p>
             )}
           </div>
@@ -355,7 +355,7 @@ export default function CheckoutPage() {
         </div>
 
         <p className="mt-4 text-center text-xs" style={{ color: "#b0a0c8" }}>
-          🔒 Paiement sécurisé — vos données sont protégées
+           Paiement sécurisé | vos données sont protégées
         </p>
       </section>
 

@@ -223,7 +223,7 @@ export default function CatalogueClient({ courses, categories }: { courses: Cour
                         className="rounded-full px-2.5 py-1 text-xs font-medium text-white"
                         style={{ background: "rgba(139,108,199,0.85)", backdropFilter: "blur(4px)" }}
                       >
-                        {isVideo ? "🎬 Vidéo" : "📝 Article"}
+                        {isVideo ? " Vidéo" : " Article"}
                       </span>
                       {c.courseType && c.courseType !== "cours" && (
                         <span
