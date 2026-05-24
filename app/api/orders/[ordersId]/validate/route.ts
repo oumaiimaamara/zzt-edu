@@ -1,47 +1,42 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromCookies } from "@/lib/auth";
+import { getUserIdFromRequest } from "@/lib/authFromRequest";
 
 export async function POST(
   req: Request,
-  ctx: { params: Promise<{ ordersId: string }> }
+  context: { params: Promise<{ ordersId: string }> }
 ) {
   try {
-    const admin = await getUserFromCookies();
-    if (!admin || admin.role !== "ADMIN") {
-      return NextResponse.json({ message: "FORBIDDEN" }, { status: 403 });
+    const { ordersId } = await context.params;
+
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
+      return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
     }
 
-    const { ordersId } = await ctx.params;
-
-    const order = await prisma.order.findUnique({
-      where: { id: ordersId },
-      include: { payment: true },
+    const admin = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
     });
 
-    if (!order) return NextResponse.json({ message: "Commande introuvable" }, { status: 404 });
+    if (!admin || admin.role !== "ADMIN") {
+      return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
+    }
 
-    await prisma.order.update({
+    const order = await prisma.order.update({
       where: { id: ordersId },
       data: { status: "paid" },
     });
 
-    await prisma.payment.update({
-      where: { orderId: ordersId },
-      data: { status: "paid", paidAt: new Date() },
-    });
-
     await prisma.library.upsert({
-      where: {
-        userId_videoId: { userId: order.userId, videoId: order.videoId },
-      },
+      where: { userId_videoId: { userId: order.userId, videoId: order.videoId } },
       update: {},
       create: { userId: order.userId, videoId: order.videoId },
     });
 
-    return NextResponse.json({ ok: true });
-  } catch (e) {
-    console.error("ORDER VALIDATE ERROR:", e);
+    return NextResponse.json({ message: "Commande validée", order }, { status: 200 });
+  } catch (err) {
+    console.error("POST /api/orders/[ordersId]/validate error:", err);
     return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
 }

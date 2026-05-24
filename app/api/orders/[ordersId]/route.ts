@@ -1,24 +1,38 @@
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromCookies } from "@/lib/auth";
+import { NextRequest } from "next/server";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { ordersId: string } }
+  _req: NextRequest,
+  context: { params: Promise<{ ordersId: string }> }
 ) {
-  const user = await getUserFromCookies();
-
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
+  try {
+    const { ordersId } = await context.params;
+    const order = await prisma.order.findUnique({
+      where: { id: ordersId },
+      include: { video: true, user: true, payment: true },
+    });
+    return NextResponse.json(order, { status: 200 });
+  } catch (err) {
+    console.error("GET /api/orders/[ordersId] error:", err);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
+}
 
-  const order = await prisma.order.findUnique({
-    where: { id: params.ordersId },
-    include: { video: true, payment: true },
-  });
-
-  if (!order || order.userId !== user.userId) {
-    return new Response("Forbidden", { status: 403 });
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ ordersId: string }> }
+) {
+  try {
+    const { ordersId } = await context.params;
+    const body = await req.json();
+    const updatedOrder = await prisma.order.update({
+      where: { id: ordersId },
+      data: body,
+    });
+    return NextResponse.json(updatedOrder, { status: 200 });
+  } catch (err) {
+    console.error("POST /api/orders/[ordersId] error:", err);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
-
-  return Response.json(order);
 }
