@@ -1,30 +1,22 @@
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_change_me";
 
-export function signToken(payload: {
-  userId: string;
-  email: string;
-  role: string;
-}) {
+export function signToken(payload: { userId: string; email?: string; role?: string }) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 }
 
-export function verifyToken(token: string) {
+export async function verifyToken(token: string): Promise<{ userId: string } | null> {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as Record<string, unknown>;
+    const userId =
+      (decoded?.userId as string) ||
+      (decoded?.id as string) ||
+      (decoded?.sub as string) ||
+      null;
+    if (!userId) return null;
+    return { userId: String(userId) };
   } catch {
     return null;
   }
-}
-
-export async function getUserFromCookies() {
-  const cookieStore = await cookies(); // NEXT 15 FIX
-
-  const token = cookieStore.get("auth_token")?.value;
-
-  if (!token) return null;
-
-  return verifyToken(token) as any;
 }

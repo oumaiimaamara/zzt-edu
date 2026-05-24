@@ -1,38 +1,38 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserIdFromRequest } from "@/lib/authFromRequest";
+import { NextRequest } from "next/server";
 
-export async function POST(req: Request) {
+export async function GET(
+  _req: NextRequest,
+  context: { params: Promise<{ ordersId: string }> }
+) {
   try {
-    const userId = await getUserIdFromRequest(req);
-
-    if (!userId) {
-      return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const videoId = body?.videoId;
-
-    if (!videoId) {
-      return NextResponse.json({ message: "videoId manquant." }, { status: 400 });
-    }
-
-    const video = await prisma.video.findUnique({ where: { id: videoId } });
-    if (!video) {
-      return NextResponse.json({ message: "Cours introuvable." }, { status: 404 });
-    }
-
-    const order = await prisma.order.create({
-      data: {
-        userId,
-        videoId,
-        status: "pending",
-      },
+    const { ordersId } = await context.params;
+    const order = await prisma.order.findUnique({
+      where: { id: ordersId },
+      include: { video: true, user: true, payment: true },
     });
-
-    return NextResponse.json({ order }, { status: 200 });
+    return NextResponse.json(order, { status: 200 });
   } catch (err) {
-    console.error("POST /api/orders error:", err);
+    console.error("GET /api/orders/[ordersId] error:", err);
+    return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
+  }
+}
+
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ ordersId: string }> }
+) {
+  try {
+    const { ordersId } = await context.params;
+    const body = await req.json();
+    const updatedOrder = await prisma.order.update({
+      where: { id: ordersId },
+      data: body,
+    });
+    return NextResponse.json(updatedOrder, { status: 200 });
+  } catch (err) {
+    console.error("POST /api/orders/[ordersId] error:", err);
     return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
 }
