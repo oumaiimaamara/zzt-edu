@@ -15,8 +15,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "orderId manquant" }, { status: 400 });
     }
 
-    // Vérifier que la commande appartient à l'utilisateur
-    const order = await prisma.order.findUnique({ where: { id: orderId } });
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { video: true },
+    });
+
     if (!order) {
       return NextResponse.json({ message: "Commande introuvable" }, { status: 404 });
     }
