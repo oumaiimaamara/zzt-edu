@@ -9,14 +9,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
     }
 
-    const { orderId, paymentMethod, status } = await req.json();
+    const { orderId, paymentMethod, status, amount } = await req.json();
+
+    if (!orderId) {
+      return NextResponse.json({ message: "orderId manquant" }, { status: 400 });
+    }
+
+    // Vérifier que la commande appartient à l'utilisateur
+    const order = await prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) {
+      return NextResponse.json({ message: "Commande introuvable" }, { status: 404 });
+    }
+    if (order.userId !== userId) {
+      return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
+    }
 
     const payment = await prisma.payment.create({
       data: {
         orderId,
-        userId,
-        method: paymentMethod,
-        status,
+        amount: amount ?? order.video?.price ?? 0,
+        method: paymentMethod ?? "online",
+        status: status ?? "paid",
       },
     });
 
